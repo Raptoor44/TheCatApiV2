@@ -1,0 +1,26 @@
+﻿@page "/FavoritesPage"
+
+@using TheCatApiV2.Data;
+@using TheCatApiV2.DatabaseModels;
+@using global::DatabaseModels;
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject DatabaseContext GetDatabaseContext
+
+
+    <AuthorizeView>
+    <MudText Typo="Typo.h1">La liste de vos favories Monsieur @this.username</MudText> 
+     <MudGrid>
+    @foreach(BreedDatabaseModel breed in this.breeds)
+    {
+          <MudItem xs="4">
+              <MudText Typo="Typo.h2">@breed.Name</MudText>
+
+                @foreach (PictureDatabaseModel pictureIt in breed.pictures)
+                {
+                <img width="450px" height="450px" src="@pictureIt.UrlPicture" />
+                }
+             
+              </MudItem>
+    }
+</MudGrid>
+        </AuthorizeView>

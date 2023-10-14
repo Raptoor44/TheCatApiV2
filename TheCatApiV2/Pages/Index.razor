@@ -1,0 +1,28 @@
+﻿@page "/"
+@using TheCatApiV2.Data;
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject DatabaseContext GetDatabaseContext
+
+<PageTitle>Page d'acceuil</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Est-ce que tu aimes le chat ?
+
+
+@if (this.loadPicture.UrlPicture is not null)
+{
+    <MudDiv>
+        <AuthorizeView>
+            <Authorized>
+                <img width="450px" height="450px" src="@this.loadPicture.UrlPicture" />
+                <MudIconButton Icon="@Icons.Material.Filled.ThumbUp" aria-label="J'aime"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Favorite" OnClick="AddInMyFavorites" aria-label=" Mettre en favorie"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.ThumbDown" aria-label="Je n'aime pas'"></MudIconButton>
+            </Authorized>
+            <NotAuthorized>
+                <p>Vous devez vous connecter pour accéder à cette page.</p>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudDiv>
+}
