@@ -22,7 +22,8 @@ namespace DatabaseModels
         [ForeignKey("PictureId")]
         public virtual PictureDatabaseModel Picture { get; set; }
 
-
-        public bool IsFavorite { get; set; } = false;
+        public bool IsFavorite { get; set; }
+        public bool isLiked { get; set; }
+        public bool isBadLike { get; set; }
     }
 }

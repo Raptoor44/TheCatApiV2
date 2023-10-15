@@ -1,4 +1,5 @@
 ﻿using DatabaseModels;
+using Microsoft.AspNetCore.Identity;
 using System.Data.Entity;
 using TheCatApiV2.Data;
 
@@ -13,7 +14,7 @@ namespace TheCatApiV2.Controller
             this._dbContext = param;
         }
 
-        public async Task AddPictureFilledAsync(PictureJoinedDatabaseModel pictureJoinParam)
+        public async Task AddPictureJoinedAsync(PictureJoinedDatabaseModel pictureJoinParam)
         {
 
             if (pictureJoinParam == null)
@@ -40,7 +41,7 @@ namespace TheCatApiV2.Controller
 
 
             var favoritesPictures = _dbContext.PicturesJoinedDatabaseModels
-                .Where(pictureJoined => pictureJoined.User.Id == idUserParam)
+                .Where(pictureJoined => pictureJoined.User.Id == idUserParam && pictureJoined.IsFavorite)
                 .ToList();
 
             foreach (PictureJoinedDatabaseModel pictureJoined in favoritesPictures) //Nous sommes obligé d'utiliser une boucle foreach car le "Include" ne fonctionne pas
@@ -55,6 +56,52 @@ namespace TheCatApiV2.Controller
             }
 
             return favoritesPictures;
+        }
+
+        public async Task DeleteFavoritByPicture(PictureDatabaseModel pictureParam, IdentityUser currentUserParam)
+        {
+            if (pictureParam == null)
+            {
+                throw new ArgumentNullException(nameof(pictureParam));
+            }
+
+            if (currentUserParam == null)
+            {
+                throw new ArgumentNullException(nameof(currentUserParam));
+            }
+
+            var pictureJoinedToUnFavorite = _dbContext.PicturesJoinedDatabaseModels
+                .FirstOrDefault(pictureJoined => pictureJoined.PictureId == pictureParam.Id && pictureJoined.UserId == currentUserParam.Id);
+
+            if (pictureJoinedToUnFavorite != null)
+            {
+                pictureJoinedToUnFavorite.IsFavorite = false;
+
+                _dbContext.PicturesJoinedDatabaseModels.Update(pictureJoinedToUnFavorite);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public PictureJoinedDatabaseModel GetByPicture(PictureDatabaseModel pictureParam)
+        {
+
+            if (pictureParam == null)
+            {
+                throw new ArgumentNullException(nameof(pictureParam));
+            }
+
+            return _dbContext.PicturesJoinedDatabaseModels.Where(picture => picture.Picture == pictureParam).FirstOrDefault();
+        }
+
+        public void UpdatePictureJoined(PictureJoinedDatabaseModel pictureJoinedParam)
+        {
+            if (pictureJoinedParam == null)
+            {
+                throw new ArgumentNullException(nameof(pictureJoinedParam));
+            }
+
+            _dbContext.Update(pictureJoinedParam);
+            _dbContext.SaveChanges();
         }
     }
 }

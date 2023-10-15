@@ -3,21 +3,20 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using TheCatApiV2.Controller;
-using System.Collections.Generic;
 using TheCatApiV2.DatabaseModels;
-using System.Linq;
-using System.Net.NetworkInformation;
-using TheCatApiV2.Data;
-using TheCatApiV2.DatabaseModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using MudBlazor;
 
 namespace TheCatApiV2.Pages
 {
     public partial class FavoritesPage
     {
-        private PictureJoinedController pictureFilledController;
+        private PictureJoinedController pictureJoinedController;
 
         private List<PictureJoinedDatabaseModel> picturesJoined;
         private List<BreedDatabaseModel> breeds = new List<BreedDatabaseModel>();
+        private List<PictureDatabaseModel> pictures = new List<PictureDatabaseModel>();
 
         private IdentityUser currentUser;
         private string username;
@@ -27,9 +26,10 @@ namespace TheCatApiV2.Pages
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+        [Authorize]
         protected override async Task OnInitializedAsync()
         {
-            this.pictureFilledController = new PictureJoinedController(GetDatabaseContext);
+            this.pictureJoinedController = new PictureJoinedController(GetDatabaseContext);
             this.picturesJoined = new List<PictureJoinedDatabaseModel>();
 
             var user = (await authenticationStateTask).User;
@@ -40,13 +40,13 @@ namespace TheCatApiV2.Pages
 
 
 
-            this.picturesJoined = await pictureFilledController.GetAllInformationsFavoritesPictureByIdUser(userId);
+            this.picturesJoined = await pictureJoinedController.GetAllInformationsFavoritesPictureByIdUser(userId);
             DispatchByBreed();
         }
 
         private void DispatchByBreed()
         {
-            foreach(PictureJoinedDatabaseModel pictureJoined in this.picturesJoined)
+            foreach (PictureJoinedDatabaseModel pictureJoined in this.picturesJoined)
             {
                 if (pictureJoined.Picture.BreedId != null)
                 {
@@ -56,7 +56,68 @@ namespace TheCatApiV2.Pages
                     }
                 }
             }
+
+            foreach (PictureJoinedDatabaseModel pictureJoined in this.picturesJoined)
+            {
+                if (pictureJoined.Picture.BreedId != null && pictureJoined.IsFavorite)
+                {
+                    this.pictures.Add(pictureJoined.Picture);
+                }
+            }
         }
 
+        private void DeleteFavorite(MouseEventArgs e, PictureDatabaseModel parametre)
+        {
+            pictureJoinedController.DeleteFavoritByPicture(parametre, currentUser);
+            picturesJoined.Remove(picturesJoined.Where(pictureJoined => pictureJoined.Id == parametre.Id).FirstOrDefault());
+            pictures.Remove(pictures.Where(picture => picture.Id == parametre.Id).FirstOrDefault());
+            this.StateHasChanged();
+        }
+
+        private void UpdateBadLike(MouseEventArgs e, PictureJoinedDatabaseModel pictureJoinedParam)
+        {
+            if (!pictureJoinedParam.isBadLike)
+            {
+                pictureJoinedParam.Picture.NumberBad++;
+                pictureJoinedParam.isBadLike = true;
+                
+                if(pictureJoinedParam.isLiked)
+                {
+                    pictureJoinedParam.isLiked = false;
+                    pictureJoinedParam.Picture.NumberLiked--;
+                }
+            }
+            else
+            {
+                pictureJoinedParam.Picture.NumberBad--;
+                pictureJoinedParam.isBadLike = false;
+            }
+
+            this.pictureJoinedController.UpdatePictureJoined(pictureJoinedParam);
+            this.StateHasChanged();
+        }
+
+        private void UpdateLike(MouseEventArgs e, PictureJoinedDatabaseModel pictureJoinedParam)
+        {
+            if (!pictureJoinedParam.isLiked)
+            {
+                pictureJoinedParam.Picture.NumberLiked++;
+                pictureJoinedParam.isLiked = true;
+
+                if (pictureJoinedParam.isBadLike)
+                {
+                    pictureJoinedParam.isBadLike = false;
+                    pictureJoinedParam.Picture.NumberBad--;
+                }
+            }
+            else
+            {
+                pictureJoinedParam.Picture.NumberLiked--;
+                pictureJoinedParam.isLiked = false;
+            }
+
+            this.pictureJoinedController.UpdatePictureJoined(pictureJoinedParam);
+            this.StateHasChanged();
+        }
     }
 }

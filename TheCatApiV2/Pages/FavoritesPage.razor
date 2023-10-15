@@ -7,20 +7,65 @@
 @inject DatabaseContext GetDatabaseContext
 
 
-    <AuthorizeView>
-    <MudText Typo="Typo.h1">La liste de vos favories Monsieur @this.username</MudText> 
-     <MudGrid>
-    @foreach(BreedDatabaseModel breed in this.breeds)
-    {
-          <MudItem xs="4">
-              <MudText Typo="Typo.h2">@breed.Name</MudText>
+<AuthorizeView>
+    <Authorized>
+        <MudText Typo="Typo.h1">La liste de vos favories Monsieur @this.username</MudText>
+        <MudGrid>
+            @foreach (BreedDatabaseModel breed in this.breeds)
+            {
+                <MudItem xs="5" class="breed-card">
+                    <MudText Typo="Typo.h2">@breed.Name</MudText>
+                    @foreach (PictureDatabaseModel pictureIt in pictures)
+                    {
+                        if (pictureIt.BreedId == breed.Id)
+                        {
+                            <MudGrid Style="margin-top: 1em">
+                                <MudItem xs="5">
+                                    <MudGrid>
+                                        <img class="image-fixed-size breed-card" src="@pictureIt.UrlPicture" />
+                                        @foreach (PictureJoinedDatabaseModel pictureJoined in pictureIt.Pictures)
+                                        {
+                                            if (pictureIt.Id == pictureJoined.Picture.Id)
+                                            {
+                                                <MudItem xs="1" Style="margin-right: 2em">
+                                                    <MudIconButton Variant="@(pictureJoined.isLiked ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbUp" OnClick="(e) => UpdateLike(e, pictureJoined)" aria-label="J'aime"></MudIconButton>
+                                                </MudItem>
+                                                <MudItem xs="1" Style="margin-right: 2em; margin-block: -0.4em">
+                                                    <MudIconButton Icon="@Icons.Material.Filled.RestoreFromTrash" OnClick="(e) => DeleteFavorite(e, pictureIt)" aria-label="Mettre en favorie"></MudIconButton>
+                                                </MudItem>
+                                                <MudItem xs="1" Style="margin-right: 2em">
+                                                    <MudIconButton Variant="@(pictureJoined.isBadLike ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbDown" OnClick="(e) => UpdateBadLike(e, pictureJoined)" aria-label="Je n'aime pas'"></MudIconButton>
+                                                </MudItem>
+                                            }
+                                        }
+                                    </MudGrid>
+                                </MudItem>
+                            </MudGrid>
+                        }
 
-                @foreach (PictureDatabaseModel pictureIt in breed.pictures)
-                {
-                <img width="450px" height="450px" src="@pictureIt.UrlPicture" />
-                }
-             
-              </MudItem>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h4">Vous devez vous connecter pour accéder à cette page.</MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+<style>
+    .image-fixed-size {
+        width: 350px; /* La largeur souhaitée */
+        height: 250px; /* La hauteur souhaitée */
+        object-fit: cover; /* Pour conserver la proportion de l'image */
     }
-</MudGrid>
-        </AuthorizeView>
+
+    .breed-card {
+        border: 1px solid #ddd; /* Ajoutez une bordure d'une largeur de 1 pixel et de couleur grise */
+        padding: 10px; /* Ajoutez un espace de remplissage pour distinguer les cartes */
+        margin: 10px; /* Ajoutez une marge pour séparer les cartes */
+        border-radius: 5px; /* Ajoutez des coins arrondis */
+    }
+
+</style>

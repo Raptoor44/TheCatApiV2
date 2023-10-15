@@ -2,6 +2,8 @@
 using System;
 using TheCatApiV2.Data;
 using System.Collections.Generic; // Importez System.Collections.Generic pour List<T>
+using Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DatabaseModels
 {
@@ -33,6 +35,13 @@ namespace DatabaseModels
             return _dbContext.PicturesDatabaseModel
                 .Include(picture => picture.Breed)
                 .ToList();
+        }
+
+        public PictureDatabaseModel GetByUrl(string url)
+        {
+            return _dbContext.PicturesDatabaseModel
+                .Where(picture => picture.UrlPicture == url)
+                .FirstOrDefault();
         }
     }
 }

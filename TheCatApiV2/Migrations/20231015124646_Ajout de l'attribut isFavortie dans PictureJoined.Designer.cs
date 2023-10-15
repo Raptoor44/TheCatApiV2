@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TheCatApiV2.Data;
 
@@ -11,9 +12,11 @@ using TheCatApiV2.Data;
 namespace TheCatApiV2.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20231015124646_Ajout de l'attribut isFavortie dans PictureJoined")]
+    partial class AjoutdelattributisFavortiedansPictureJoined
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,12 +72,6 @@ namespace TheCatApiV2.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("isBadLike")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isLiked")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
