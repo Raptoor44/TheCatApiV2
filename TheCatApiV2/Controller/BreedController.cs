@@ -1,4 +1,5 @@
-﻿using TheCatApiV2.Data;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TheCatApiV2.Data;
 using TheCatApiV2.DatabaseModels;
 using TheCatApiV2.Models;
 
@@ -13,6 +14,11 @@ namespace TheCatApiV2.Controller
         public BreedController(DatabaseContext param)
         {
             this._dbContext = param;
+        }
+
+        public List<BreedSelectModel> GetSelectBreeds()
+        {
+            return _dbContext.BreedsDatabaseModel.Select(breed => new BreedSelectModel { Id = breed.Id, Name = breed.Name}).ToList();
         }
 
         public bool verifyToUpdate(int countParam)
@@ -129,6 +135,11 @@ namespace TheCatApiV2.Controller
             });
 
             return breeds;
+        }
+
+        public BreedDatabaseModel GetBreedById(string id)
+        {
+            return _dbContext.BreedsDatabaseModel.Where(breed => breed.Id == id).FirstOrDefault();
         }
     }
 }

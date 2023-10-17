@@ -1,0 +1,77 @@
+﻿@page "/breeds"
+@using TheCatApiV2.Data;
+@using TheCatApiV2.Models;
+@inject DatabaseContext GetDatabaseContext
+
+<MudText Typo="Typo.h1">Voici la liste des favorites Monsieur</MudText>
+
+<InputSelect @bind-Value="bindValue" class="form-control" @onclick="UpdateCurrentBreed">
+    @foreach (BreedSelectModel breed in breedsSelect)
+    {
+        <option value="@breed.Id">@breed.Name</option>
+    }
+</InputSelect>
+
+<MudContainer Style="margin-top: 5em">
+    <MudText Typo="Typo.h1">Détails de la race</MudText>
+
+    <!-- Afficher les détails de currentBreed si l'objet est défini -->
+    @if (currentBreed != null)
+    {
+        <MudGrid>
+            <MudPaper Elevation="4">
+                <br>
+                <MudText Typo="Typo.h2">@currentBreed.Name</MudText>
+
+
+                <MudDiv class="card">
+                    <MudText Typo="Typo.h3">Description</MudText>
+                    <MudText Style="margin-top: 2em">@currentBreed.Description</MudText>
+                </MudDiv>
+                <MudDiv class="card">
+                    <MudText Typo="Typo.h3">Origine</MudText>
+                    <MudText Style="margin-top: 2em">@currentBreed.Origin</MudText>
+                </MudDiv>
+                <MudDiv class="card">
+                    <MudText Typo="Typo.h3">Pays d'origine</MudText>
+                    <MudText Style="margin-top: 2em">@currentBreed.CountryCodes</MudText>
+                </MudDiv>
+
+                <MudDiv class="card">
+                    <MudText Typo="Typo.h3">Tempérament</MudText>
+                    <MudText Style="margin-top: 2em">@currentBreed.Temperament</MudText>
+                </MudDiv>
+                <MudDiv class="card">
+                    <MudText Typo="Typo.h3">Durée de vie moyenne</MudText>
+                    <MudText Style="margin-top: 2em">@currentBreed.LifeSpan</MudText>
+                </MudDiv>
+            </MudPaper>
+        </MudGrid>
+    }
+
+    <!-- Le reste de votre code Razor -->
+</MudContainer>
+
+<style>
+
+    .card {
+        border: 1px solid #ddd; /* Ajoutez une bordure d'une largeur de 1 pixel et de couleur grise */
+        padding: 10px; /* Ajoutez un espace de remplissage pour distinguer les cartes */
+        margin: 10px; /* Ajoutez une marge pour séparer les cartes */
+        border-radius: 5px; /* Ajoutez des coins arrondis */
+    }
+
+    h3 {
+        font-family: "Arial", sans-serif; /* Choisissez une police de caractères */
+        font-size: 24px; /* Taille de la police */
+        color: blue; /* Couleur du texte */
+        text-transform: uppercase; /* Met en majuscules le texte */
+        text-align: center; /* Alignement du texte */
+        background-color: #f0f0f0; /* Couleur de fond */
+        padding: 10px 20px; /* Rembourrage intérieur */
+        border: 2px solid #ccc; /* Bordure */
+        border-radius: 10px; /* Coins arrondis */
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Ombre */
+    }
+
+</style>

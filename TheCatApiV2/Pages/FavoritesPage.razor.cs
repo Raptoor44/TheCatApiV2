@@ -38,8 +38,6 @@ namespace TheCatApiV2.Pages
             string userId = currentUser.Id;
             this.username = currentUser.UserName;
 
-
-
             this.picturesJoined = await pictureJoinedController.GetAllInformationsFavoritesPictureByIdUser(userId);
             DispatchByBreed();
         }
