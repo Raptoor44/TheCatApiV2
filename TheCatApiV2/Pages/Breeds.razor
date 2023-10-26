@@ -3,55 +3,85 @@
 @using TheCatApiV2.Models;
 @inject DatabaseContext GetDatabaseContext
 
-<MudText Typo="Typo.h1">Voici la liste des favorites Monsieur</MudText>
+<MudText Style="margin-top: 3em" Typo="Typo.h3">Voici la liste des favorites Monsieur</MudText>
 
-<InputSelect @bind-Value="bindValue" class="form-control" @onclick="UpdateCurrentBreed">
+
+<MudSelect Variant="Variant.Outlined" Label="Liste des races par nom" Dense="true" Margin="Margin.Dense" T="string" ValueChanged="@UpdateCurrentBreed">
     @foreach (BreedSelectModel breed in breedsSelect)
     {
-        <option value="@breed.Id">@breed.Name</option>
-    }
-</InputSelect>
-
-<MudContainer Style="margin-top: 5em">
-    <MudText Typo="Typo.h1">Détails de la race</MudText>
-
-    <!-- Afficher les détails de currentBreed si l'objet est défini -->
-    @if (currentBreed != null)
-    {
-        <MudGrid>
-            <MudPaper Elevation="4">
-                <br>
-                <MudText Typo="Typo.h2">@currentBreed.Name</MudText>
-
-
-                <MudDiv class="card">
-                    <MudText Typo="Typo.h3">Description</MudText>
-                    <MudText Style="margin-top: 2em">@currentBreed.Description</MudText>
-                </MudDiv>
-                <MudDiv class="card">
-                    <MudText Typo="Typo.h3">Origine</MudText>
-                    <MudText Style="margin-top: 2em">@currentBreed.Origin</MudText>
-                </MudDiv>
-                <MudDiv class="card">
-                    <MudText Typo="Typo.h3">Pays d'origine</MudText>
-                    <MudText Style="margin-top: 2em">@currentBreed.CountryCodes</MudText>
-                </MudDiv>
-
-                <MudDiv class="card">
-                    <MudText Typo="Typo.h3">Tempérament</MudText>
-                    <MudText Style="margin-top: 2em">@currentBreed.Temperament</MudText>
-                </MudDiv>
-                <MudDiv class="card">
-                    <MudText Typo="Typo.h3">Durée de vie moyenne</MudText>
-                    <MudText Style="margin-top: 2em">@currentBreed.LifeSpan</MudText>
-                </MudDiv>
-            </MudPaper>
-        </MudGrid>
+        <MudSelectItem T="string" Value="@breed.Id">@breed.Name</MudSelectItem>
     }
 
-    <!-- Le reste de votre code Razor -->
-</MudContainer>
+</MudSelect>
 
+<MudText Style="margin-top: 3em" Typo="Typo.subtitle1">Veuillez sélectionner l'emplacement pour changer les onglets.</MudText>
+
+<MudSelect Variant="Variant.Outlined" Label="Tabs Position" Dense="true" Margin="Margin.Dense" T="@Position" @bind-Value="Position">
+    <MudSelectItem T="Position" Value="@Position.Top">En haut</MudSelectItem>
+    <MudSelectItem T="Position" Value="@Position.Start">Au début</MudSelectItem>
+    <MudSelectItem T="Position" Value="@Position.Left">Gauche</MudSelectItem>
+    <MudSelectItem T="Position" Value="@Position.Right">Droite</MudSelectItem>
+    <MudSelectItem T="Position" Value="@Position.End">Fin</MudSelectItem>
+    <MudSelectItem T="Position" Value="@Position.Bottom">Bas</MudSelectItem>
+</MudSelect>
+
+<MudTabs Outlined="true" Position="@Position" Rounded="true" Border="true"
+         ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+    <MudTabPanel Text="Description de la race">
+        <MudContainer Style="margin-top: em">
+            <!-- Afficher les détails de currentBreed si l'objet est défini -->
+            @if (currentBreed != null)
+            {
+                <MudGrid>
+                    <MudPaper Elevation="4">
+                        <MudText Typo="Typo.h4">Détails de la race</MudText>
+                        <MudText Style="margin-top: 1em" Typo="Typo.h2">@currentBreed.Name</MudText>
+                        <MudDiv class="card">
+                            <MudText Typo="Typo.h3">Description</MudText>
+                            <MudText Style="margin-top: 2em">@currentBreed.Description</MudText>
+                        </MudDiv>
+                        <MudDiv class="card">
+                            <MudText Typo="Typo.h3">Origine</MudText>
+                            <MudText Style="margin-top: 2em">@currentBreed.Origin</MudText>
+                        </MudDiv>
+                        <MudDiv class="card">
+                            <MudText Typo="Typo.h3">Pays d'origine</MudText>
+                            <MudText Style="margin-top: 2em">@currentBreed.CountryCodes</MudText>
+                        </MudDiv>
+
+                        <MudDiv class="card">
+                            <MudText Typo="Typo.h3">Tempérament</MudText>
+                            <MudText Style="margin-top: 2em">@currentBreed.Temperament</MudText>
+                        </MudDiv>
+                        <MudDiv class="card">
+                            <MudText Typo="Typo.h3">Durée de vie moyenne</MudText>
+                            <MudText Style="margin-top: 2em">@currentBreed.LifeSpan</MudText>
+                        </MudDiv>
+                    </MudPaper>
+                </MudGrid>
+            }
+            <!-- Le reste de votre code Razor -->
+        </MudContainer>
+    </MudTabPanel>
+    <MudTabPanel Text="Liste d'images">
+        <MudContainer>
+            <MudGrid>
+                @foreach (string pictureUrl in this.pictureBreedsOne)
+                {
+                    <MudItem xs="5">
+                        <img class="card" width="450px" height="450px" src="@pictureUrl" />
+                    </MudItem>
+                }
+                @foreach (string pictureUrl in this.pictureBreedsTwo)
+                {
+                    <MudItem xs="5">
+                        <img class="card" width="450px" height="450px" src="@pictureUrl" />
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudContainer>
+    </MudTabPanel>
+</MudTabs>
 <style>
 
     .card {
