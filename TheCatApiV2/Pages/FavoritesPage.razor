@@ -6,10 +6,9 @@
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 @inject DatabaseContext GetDatabaseContext
 
-
 <AuthorizeView>
     <Authorized>
-        <MudText Typo="Typo.h3">La liste de vos favories Monsieur @this.username</MudText>
+        <MudText Style="margin-bottom: 3em" Typo="Typo.h3">La liste de vos favories @this.username</MudText>
         <MudGrid>
             @foreach (BreedDatabaseModel breed in this.breeds)
             {
@@ -23,28 +22,55 @@
                                 <MudItem xs="5">
                                     <MudGrid>
                                         <img class="image-fixed-size breed-card" src="@pictureIt.UrlPicture" />
-                                        @foreach (PictureJoinedDatabaseModel pictureJoined in pictureIt.Pictures)
-                                        {
-                                            if (pictureIt.Id == pictureJoined.Picture.Id)
+                                        @{
+                                            foreach (PictureJoinedDatabaseModel pictureJoined in pictureIt.Pictures)
                                             {
-                                                <MudItem xs="1" Style="margin-right: 2em">
-                                                    <MudIconButton Variant="@(pictureJoined.isLiked ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbUp" OnClick="(e) => UpdateLike(e, pictureJoined)" aria-label="J'aime"></MudIconButton>
-                                                </MudItem>
-                                                <MudItem xs="1" Style="margin-right: 2em; margin-block: -0.4em">
-                                                    <MudIconButton Icon="@Icons.Material.Filled.RestoreFromTrash" OnClick="(e) => DeleteFavorite(e, pictureIt)" aria-label="Mettre en favorie"></MudIconButton>
-                                                </MudItem>
-                                                <MudItem xs="1" Style="margin-right: 2em">
-                                                    <MudIconButton Variant="@(pictureJoined.isBadLike ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbDown" OnClick="(e) => UpdateBadLike(e, pictureJoined)" aria-label="Je n'aime pas'"></MudIconButton>
-                                                </MudItem>
+                                                string titleLike = "Nombre de likes : " + @pictureIt.NumberLiked;
+                                                string titleUnLike = "Nombre de UnLikes : " + @pictureIt.NumberBad;
+                                                if (pictureIt.Id == pictureJoined.Picture.Id)
+                                                {
+                                                    <MudIconButton Style="margin-left: 2em" Color="Color.Success" Variant="@(pictureJoined.isLiked ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbUp" OnClick="(e) => UpdateLike(e, pictureJoined)" Title=@titleLike></MudIconButton>
+                                                    <MudIconButton Style="margin-left: 1em;" Icon="@Icons.Material.Filled.RestoreFromTrash" OnClick="(e) => DeleteFavorite(e, pictureIt)" aria-label="Supprimer des favories"></MudIconButton>
+                                                    <MudIconButton Style="margin-left: 1em" Color="Color.Warning" Variant="@(pictureJoined.isBadLike ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbDown" OnClick="(e) => UpdateBadLike(e, pictureJoined)" Title=@titleUnLike></MudIconButton>
+                                                }
                                             }
                                         }
                                     </MudGrid>
                                 </MudItem>
                             </MudGrid>
                         }
-
                     }
                 </MudItem>
+            }
+        </MudGrid>
+        <MudGrid>
+            <MudItem xs="12" Style="margin-top: 5em; margin-bottom: 5em">
+                <MudText Typo="Typo.h5">Vos favorites sans race associées</MudText>
+            </MudItem>
+
+            @{
+                for (int i = 0; i < picturesJoinedWithoutBreed.Count; i += 5)
+                {
+
+
+                    @for (int j = i; j < Math.Min(i + 5, picturesJoinedWithoutBreed.Count); j++)
+                    {
+                        var pictureJoined = picturesJoinedWithoutBreed[j];
+                        string titleLike = "Nombre de like : " + @picturesJoinedWithoutBreed[j].Picture.NumberLiked;
+                        string titleUnLike = "Nombre de UnLike : " + @picturesJoinedWithoutBreed[j].Picture.NumberBad;
+                        <MudItem xs="3" Class="breed">
+                            <MudItem xs="6">
+                                <img class="image-fixed-size breed-card" src="@pictureJoined.Picture.UrlPicture" />
+                            </MudItem>
+                            <MudItem xs="6" Style="margin-left : 5em">
+                                <MudIconButton Color="Color.Success" Variant="@(pictureJoined.isLiked ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbUp" OnClick="(e) => UpdateLike(e, pictureJoined)" aria-label="J'aime" Title=@titleLike></MudIconButton>
+                                <MudIconButton Style="margin-left : 1em" Icon="@Icons.Material.Filled.RestoreFromTrash" OnClick="(e) => DeleteFavorite(e, pictureJoined.Picture)" aria-label="Mettre en favorie"></MudIconButton>
+                                <MudIconButton Style="margin-left : 1em" Color="Color.Warning" Variant="@(pictureJoined.isBadLike ? Variant.Filled : Variant.Outlined)" Icon="@Icons.Material.Filled.ThumbDown" OnClick="(e) => UpdateBadLike(e, pictureJoined)" aria-label="Je n'aime pas" Title=@titleUnLike></MudIconButton>
+                            </MudItem>
+                        </MudItem>
+                    }
+
+                }
             }
         </MudGrid>
     </Authorized>

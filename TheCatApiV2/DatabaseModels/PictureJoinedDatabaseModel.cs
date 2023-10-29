@@ -1,7 +1,5 @@
-﻿
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Providers.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace DatabaseModels
@@ -25,5 +23,10 @@ namespace DatabaseModels
         public bool IsFavorite { get; set; }
         public bool isLiked { get; set; }
         public bool isBadLike { get; set; }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, UserId: {UserId}, PictureId: {PictureId}, IsFavorite: {IsFavorite}, isLiked: {isLiked}, isBadLike: {isBadLike}";
+        }
     }
 }

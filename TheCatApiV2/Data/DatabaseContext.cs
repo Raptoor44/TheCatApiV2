@@ -5,7 +5,7 @@ using TheCatApiV2.DatabaseModels;
 
 namespace TheCatApiV2.Data
 {
-    public class DatabaseContext : IdentityDbContext // Assurez-vous que vous utilisez DbContext ici
+    public class DatabaseContext : IdentityDbContext
     {
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)

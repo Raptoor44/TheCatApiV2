@@ -1,6 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
+﻿#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -45,60 +43,31 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le champ {0} doit contenir au moins {2} caractères et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Mot de passe")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirmer le mot de passe")]
+            [Compare("Password", ErrorMessage = "Le mot de passe et la confirmation du mot de passe ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
         }
-
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -120,7 +89,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("L'utilisateur a créé un nouveau compte avec un mot de passe.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -131,8 +100,8 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirmez votre adresse e-mail",
+                        $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -150,7 +119,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            // Si nous en sommes arrivés là, quelque chose a échoué, réaffichez le formulaire
             return Page();
         }
 
@@ -162,9 +131,9 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+                throw new InvalidOperationException($"Impossible de créer une instance de '{nameof(IdentityUser)}'. " +
+                    $"Assurez-vous que '{nameof(IdentityUser)}' n'est pas une classe abstraite et qu'elle a un constructeur sans paramètres, ou alternativement, " +
+                    $"remplacez la page d'inscription dans /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
 
@@ -172,7 +141,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
         {
             if (!_userManager.SupportsUserEmail)
             {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
+                throw new NotSupportedException("L'interface utilisateur par défaut nécessite un magasin d'utilisateurs prenant en charge les adresses e-mail.");
             }
             return (IUserEmailStore<IdentityUser>)_userStore;
         }

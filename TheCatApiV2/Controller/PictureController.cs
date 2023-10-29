@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore; // Assurez-vous d'utiliser uniquement Microsoft.EntityFrameworkCore
-using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using TheCatApiV2.Data;
-using System.Collections.Generic; // Importez System.Collections.Generic pour List<T>
-using Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace DatabaseModels
 {
@@ -42,6 +39,13 @@ namespace DatabaseModels
             return _dbContext.PicturesDatabaseModel
                 .Where(picture => picture.UrlPicture == url)
                 .FirstOrDefault();
+        }
+        public List<PictureDatabaseModel> GetTopLike()
+        {
+            return _dbContext.PicturesDatabaseModel
+                .OrderByDescending(picture => picture.NumberLiked)
+                .Take(10)
+                .ToList();
         }
     }
 }

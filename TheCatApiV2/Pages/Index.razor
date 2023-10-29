@@ -1,26 +1,52 @@
 ﻿@page "/"
 @using TheCatApiV2.Data;
+@using global::DatabaseModels;
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 @inject DatabaseContext GetDatabaseContext
 
-<PageTitle>Page d'acceuil</PageTitle>
-
-Est-ce que tu aimes le chat ?
-
+<PageTitle>page d'accueil</PageTitle>
 
 @if (this.loadPicture.UrlPicture is not null)
 {
     <MudDiv>
         <AuthorizeView>
             <Authorized>
-                <img width="450px" height="450px" src="@this.loadPicture.UrlPicture" />
-                <MudIconButton Icon="@Icons.Material.Filled.ThumbUp" Variant="@variantLike"  aria-label="J'aime" OnClick="Like"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Favorite" OnClick="AddInMyFavorites" aria-label=" Mettre en favorie"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.ThumbDown" Variant="@variantBadLike" aria-label="Je n'aime pas'" OnClick="BadLike"></MudIconButton>
+
+                <MudText style="margin-bottom: 5em" Typo="Typo.body1">Est-ce que tu aimes le chat ?</MudText>
+                <MudGrid>
+                    <MudItem xs="6">
+                        <img width="450px" height="450px" src="@this.loadPicture.UrlPicture" />
+                        <MudGrid Style="margin-top: 5em; margin-left: 5em">
+                            <MudIconButton Color="Color.Success" Icon="@Icons.Material.Filled.ThumbUp" Variant="@variantLike" aria-label="J'aime" OnClick="Like"></MudIconButton>
+                            <MudIconButton Style=" margin-left: 2em" Icon="@Icons.Material.Filled.Favorite" OnClick="AddInMyFavorites" aria-label=" Mettre en favorie"></MudIconButton>
+                            <MudIconButton Style=" margin-left: 2em" Color="Color.Warning" Icon="@Icons.Material.Filled.ThumbDown" Variant="@variantBadLike" aria-label="Je n'aime pas'" OnClick="BadLike"></MudIconButton>
+                        </MudGrid>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudText Typo="Typo.h5">Informations</MudText>
+                        <MudText Style="margin-top: 5em" Typo="Typo.body1">Bienvenue dans le monde incroyable des chats. Ici, vous pouvez aimer, ne pas aimer un chat, le mettre en favoris et voir tous vos favoris rangées par race. Vous avez la possibilité de gérer votre compte et de télécharger vos données personnelles avec toutes les informations associées à vous et à vos interactions avec le site. Vous avez une page Race où vous pouvez avoir des informations sur la race sélectionnée ainsi que des images à propos de cette race.</MudText>
+                    </MudItem>
+                </MudGrid>
             </Authorized>
-            <NotAuthorized>
-                <MudText Typo="Typo.h4">Vous devez vous connecter pour accéder à cette page.</MudText>
-            </NotAuthorized>
         </AuthorizeView>
+        @if (pictures != null)
+        {
+            <MudText style="margin-bottom: 5em;margin-top:5em" Typo="Typo.body1">Liste des chats avec le plus de like. À vous de les trouver ailleurs;)</MudText>
+            <MudGrid Style="margin-top:5em">
+
+                @for (int i = 0; i < pictures.Count; i += 5)
+                {
+                    @for (int j = i; j < Math.Min(i + 5, pictures.Count); j++)
+                    {
+                        var picture = pictures[j];
+                        <MudItem xs="4">
+                            <img width="450px" height="450px" src="@picture.UrlPicture" />
+                            <MudText style="margin-bottom: 5em; margin-top:1em" Typo="Typo.body1">Nombre de likes : @picture.NumberLiked</MudText>
+                        </MudItem>
+                    }
+                }
+
+            </MudGrid>
+        }
     </MudDiv>
 }

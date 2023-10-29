@@ -44,7 +44,7 @@ namespace TheCatApiV2.Controller
                 .Where(pictureJoined => pictureJoined.User.Id == idUserParam && pictureJoined.IsFavorite)
                 .ToList();
 
-            foreach (PictureJoinedDatabaseModel pictureJoined in favoritesPictures) //Nous sommes obligé d'utiliser une boucle foreach car le "Include" ne fonctionne pas
+            foreach (PictureJoinedDatabaseModel pictureJoined in favoritesPictures) //Nous sommes obligé d'utiliser une boucle foreach car le "Include" ne fonctionne pas.
             {
                 foreach (PictureDatabaseModel picture in userPictures)
                 {
@@ -102,6 +102,24 @@ namespace TheCatApiV2.Controller
 
             _dbContext.Update(pictureJoinedParam);
             _dbContext.SaveChanges();
+        }
+
+        public List<PictureJoinedDatabaseModel> GetAllFavoritesWithoutBreed(string currentUserParam)
+        {
+            return _dbContext.PicturesJoinedDatabaseModels.Where(pictureJoined => pictureJoined.Picture.BreedId == null && pictureJoined.IsFavorite && pictureJoined.User.Id == currentUserParam).Include(pictureJoined => pictureJoined.Picture).ToList();
+        }
+
+        public List<PictureJoinedDatabaseModel> GetAllPicturesByUserId(string currentUserParam)
+        {
+            return _dbContext.PicturesJoinedDatabaseModels.Where(pictureJoined => pictureJoined.UserId == currentUserParam).Include(pictureJoined => pictureJoined.Picture).ToList();
+        }
+
+        public PictureJoinedDatabaseModel GetPictureJoinedByUrlAndUser(string currentUserParam, string url)
+        {
+            return _dbContext.PicturesJoinedDatabaseModels.Where(pictureJoined => pictureJoined.UserId == currentUserParam && pictureJoined.Picture.UrlPicture == url)
+                .Include(pictureJoined => pictureJoined.User)
+                .Include(pictureJoined => pictureJoined.Picture)
+                .FirstOrDefault();
         }
     }
 }

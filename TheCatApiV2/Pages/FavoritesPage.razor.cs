@@ -6,7 +6,6 @@ using TheCatApiV2.Controller;
 using TheCatApiV2.DatabaseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Web;
-using MudBlazor;
 
 namespace TheCatApiV2.Pages
 {
@@ -18,8 +17,11 @@ namespace TheCatApiV2.Pages
         private List<BreedDatabaseModel> breeds = new List<BreedDatabaseModel>();
         private List<PictureDatabaseModel> pictures = new List<PictureDatabaseModel>();
 
+        private List<PictureJoinedDatabaseModel> picturesJoinedWithoutBreed = new List<PictureJoinedDatabaseModel>();
+
         private IdentityUser currentUser;
         private string username;
+        private string userId;
 
         [Inject]
         Microsoft.AspNetCore.Identity.UserManager<IdentityUser> userManager { get; set; }
@@ -33,13 +35,25 @@ namespace TheCatApiV2.Pages
             this.picturesJoined = new List<PictureJoinedDatabaseModel>();
 
             var user = (await authenticationStateTask).User;
-            currentUser = await userManager.GetUserAsync(user);
 
-            string userId = currentUser.Id;
-            this.username = currentUser.UserName;
+            if (user.Identity.IsAuthenticated)
+            {
+                currentUser = await userManager.GetUserAsync(user);
 
-            this.picturesJoined = await pictureJoinedController.GetAllInformationsFavoritesPictureByIdUser(userId);
-            DispatchByBreed();
+                this.userId = currentUser.Id;
+                this.username = currentUser.UserName;
+
+                this.picturesJoined = await pictureJoinedController.GetAllInformationsFavoritesPictureByIdUser(this.userId);
+                DispatchByBreed();
+                InitFavoritesWithoutBreeds();
+            }
+        }
+
+        private void InitFavoritesWithoutBreeds()
+        {
+            this.picturesJoinedWithoutBreed = pictureJoinedController.GetAllFavoritesWithoutBreed(this.userId);
+
+            this.StateHasChanged();
         }
 
         private void DispatchByBreed()
@@ -67,7 +81,8 @@ namespace TheCatApiV2.Pages
         private void DeleteFavorite(MouseEventArgs e, PictureDatabaseModel parametre)
         {
             pictureJoinedController.DeleteFavoritByPicture(parametre, currentUser);
-            picturesJoined.Remove(picturesJoined.Where(pictureJoined => pictureJoined.Id == parametre.Id).FirstOrDefault());
+            picturesJoined.Remove(picturesJoined.Where(pictureJoined => pictureJoined.Picture.Id == parametre.Id).FirstOrDefault());
+            picturesJoinedWithoutBreed.Remove(picturesJoinedWithoutBreed.Where(picturesJoined => picturesJoined.Picture.Id == parametre.Id).FirstOrDefault());
             pictures.Remove(pictures.Where(picture => picture.Id == parametre.Id).FirstOrDefault());
             this.StateHasChanged();
         }
@@ -78,8 +93,8 @@ namespace TheCatApiV2.Pages
             {
                 pictureJoinedParam.Picture.NumberBad++;
                 pictureJoinedParam.isBadLike = true;
-                
-                if(pictureJoinedParam.isLiked)
+
+                if (pictureJoinedParam.isLiked)
                 {
                     pictureJoinedParam.isLiked = false;
                     pictureJoinedParam.Picture.NumberLiked--;

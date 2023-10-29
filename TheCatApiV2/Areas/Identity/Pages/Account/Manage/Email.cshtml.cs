@@ -1,6 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
+﻿#nullable disable
 
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -31,45 +29,20 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Email { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public bool IsEmailConfirmed { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
-            [Display(Name = "New email")]
+            [Display(Name = "Nouvel e-mail")]
             public string NewEmail { get; set; }
         }
 
@@ -91,7 +64,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{_userManager.GetUserId(User)}'.");
             }
 
             await LoadAsync(user);
@@ -103,7 +76,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -125,23 +98,23 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
                     protocol: Request.Scheme);
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Confirmez votre e-mail",
+                    $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                StatusMessage = "Lien de confirmation pour le changement d'e-mail envoyé. Veuillez vérifier votre e-mail.";
                 return RedirectToPage();
             }
 
-            StatusMessage = "Your email is unchanged.";
+            StatusMessage = "Votre e-mail n'a pas changé.";
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostSendVerificationEmailAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (user is null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -161,10 +134,10 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                "Confirmez votre e-mail",
+                $"Veuillez confirmer votre compte en <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>cliquant ici</a>.");
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = "E-mail de vérification envoyé. Veuillez vérifier votre e-mail.";
             return RedirectToPage();
         }
     }

@@ -1,5 +1,5 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+﻿// Sous licence de la .NET Foundation en vertu d'un ou plusieurs accords.
+// La .NET Foundation vous accorde une licence pour ce fichier en vertu de la licence MIT.
 #nullable disable
 
 using System;
@@ -25,11 +25,11 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        ///     Cette API prend en charge l'infrastructure d'interface utilisateur par défaut d'ASP.NET Core Identity et n'est pas destinée à être utilisée
+        ///     directement depuis votre code. Cette API peut être modifiée ou supprimée dans les versions futures.
         /// </summary>
         [TempData]
-        public string StatusMessage { get; set; }
+        public string MessageStatut { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string userId, string email, string code)
         {
@@ -41,28 +41,28 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{userId}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{userId}'.");
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ChangeEmailAsync(user, email, code);
             if (!result.Succeeded)
             {
-                StatusMessage = "Error changing email.";
+                MessageStatut = "Erreur lors du changement d'adresse e-mail.";
                 return Page();
             }
 
-            // In our UI email and user name are one and the same, so when we update the email
-            // we need to update the user name.
-            var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
-            if (!setUserNameResult.Succeeded)
+            // Dans notre interface utilisateur, l'adresse e-mail et le nom d'utilisateur sont identiques, donc lorsque nous mettons à jour l'adresse e-mail
+            // nous devons également mettre à jour le nom d'utilisateur.
+            var setResultNomUtilisateur = await _userManager.SetUserNameAsync(user, email);
+            if (!setResultNomUtilisateur.Succeeded)
             {
-                StatusMessage = "Error changing user name.";
+                MessageStatut = "Erreur lors du changement du nom d'utilisateur.";
                 return Page();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Thank you for confirming your email change.";
+            MessageStatut = "Merci de confirmer votre changement d'adresse e-mail.";
             return Page();
         }
     }

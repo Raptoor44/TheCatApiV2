@@ -2,8 +2,11 @@
 @using TheCatApiV2.Data;
 @using TheCatApiV2.Models;
 @inject DatabaseContext GetDatabaseContext
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 
-<MudText Style="margin-top: 3em" Typo="Typo.h3">Voici la liste des favorites Monsieur</MudText>
+
+
+<MudText Style="margin-top: 3em; margin-bottom: 3em" Typo="Typo.h3">Page des différentes races</MudText>
 
 
 <MudSelect Variant="Variant.Outlined" Label="Liste des races par nom" Dense="true" Margin="Margin.Dense" T="string" ValueChanged="@UpdateCurrentBreed">
@@ -14,7 +17,7 @@
 
 </MudSelect>
 
-<MudText Style="margin-top: 3em" Typo="Typo.subtitle1">Veuillez sélectionner l'emplacement pour changer les onglets.</MudText>
+<MudText Style="margin-top: 3em; margin-bottom: 2em" Typo="Typo.subtitle1">Veuillez sélectionner l'emplacement pour changer les onglets.</MudText>
 
 <MudSelect Variant="Variant.Outlined" Label="Tabs Position" Dense="true" Margin="Margin.Dense" T="@Position" @bind-Value="Position">
     <MudSelectItem T="Position" Value="@Position.Top">En haut</MudSelectItem>
@@ -29,7 +32,6 @@
          ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
     <MudTabPanel Text="Description de la race">
         <MudContainer Style="margin-top: em">
-            <!-- Afficher les détails de currentBreed si l'objet est défini -->
             @if (currentBreed != null)
             {
                 <MudGrid>
@@ -37,51 +39,82 @@
                         <MudText Typo="Typo.h4">Détails de la race</MudText>
                         <MudText Style="margin-top: 1em" Typo="Typo.h2">@currentBreed.Name</MudText>
                         <MudDiv class="card">
-                            <MudText Typo="Typo.h3">Description</MudText>
+                            <MudText Typo="Typo.h5">Description</MudText>
                             <MudText Style="margin-top: 2em">@currentBreed.Description</MudText>
                         </MudDiv>
                         <MudDiv class="card">
-                            <MudText Typo="Typo.h3">Origine</MudText>
+                            <MudText Typo="Typo.h5">Origine</MudText>
                             <MudText Style="margin-top: 2em">@currentBreed.Origin</MudText>
                         </MudDiv>
                         <MudDiv class="card">
-                            <MudText Typo="Typo.h3">Pays d'origine</MudText>
+                            <MudText Typo="Typo.h5">Pays d'origine</MudText>
                             <MudText Style="margin-top: 2em">@currentBreed.CountryCodes</MudText>
                         </MudDiv>
 
                         <MudDiv class="card">
-                            <MudText Typo="Typo.h3">Tempérament</MudText>
+                            <MudText Typo="Typo.h5">Tempérament</MudText>
                             <MudText Style="margin-top: 2em">@currentBreed.Temperament</MudText>
                         </MudDiv>
                         <MudDiv class="card">
-                            <MudText Typo="Typo.h3">Durée de vie moyenne</MudText>
+                            <MudText Typo="Typo.h5">Durée de vie moyenne</MudText>
                             <MudText Style="margin-top: 2em">@currentBreed.LifeSpan</MudText>
                         </MudDiv>
                     </MudPaper>
                 </MudGrid>
             }
-            <!-- Le reste de votre code Razor -->
+            else
+            {
+                <MudText Typo="Typo.subtitle1">Veuillez sélectionner une race.</MudText>
+            }
         </MudContainer>
     </MudTabPanel>
     <MudTabPanel Text="Liste d'images">
         <MudContainer>
             <MudGrid>
-                @foreach (string pictureUrl in this.pictureBreedsOne)
+                @if (this.pictureBreedsOne.Count != 0 && this.pictureBreedsTwo.Count != 0)
                 {
-                    <MudItem xs="5">
-                        <img class="card" width="450px" height="450px" src="@pictureUrl" />
-                    </MudItem>
+                    @foreach (string pictureUrl in this.pictureBreedsOne)
+                    {
+                        <MudItem xs="5">
+                            <MudItem xs="12" style="display: flex; align-items: center;">
+                                <img class="card" width="450px" height="450px" src="@pictureUrl" />
+                            </MudItem>
+                            <MudItem xs="12" style="display: flex; align-items: center;">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <MudIconButton Style="margin-left: 2em" Icon="@Icons.Material.Filled.Favorite" OnClick="(e) => AddInMyFavorites(pictureUrl)" aria-label="Mettre en favori"></MudIconButton>
+                                        <MudText Typo="Typo.subtitle2" style="margin-left: 0.5em;">Mettre en favoris</MudText>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </MudItem>
+                        </MudItem>
+                    }
+                    @foreach (string pictureUrl in this.pictureBreedsTwo)
+                    {
+                        <MudItem xs="5">
+                            <MudItem xs="12" style="display: flex; align-items: center;">
+                                <img class="card" width="450px" height="450px" src="@pictureUrl" />
+                            </MudItem>
+                            <MudItem xs="12" style="display: flex; align-items: center;">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <MudIconButton Style="margin-left: 2em" Icon="@Icons.Material.Filled.Favorite" OnClick="(e) => AddInMyFavorites(pictureUrl)" aria-label="Mettre en favori"></MudIconButton>
+                                        <MudText Typo="Typo.subtitle2" style="margin-left: 0.5em;">Mettre en favoris</MudText>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </MudItem>
+                        </MudItem>
+                    }
                 }
-                @foreach (string pictureUrl in this.pictureBreedsTwo)
+                else
                 {
-                    <MudItem xs="5">
-                        <img class="card" width="450px" height="450px" src="@pictureUrl" />
-                    </MudItem>
+                    <MudText Style="margin-top:0.8em; margin-left:0.7em" Typo="Typo.subtitle1">Veuillez sélectionner une race.</MudText>
                 }
             </MudGrid>
         </MudContainer>
     </MudTabPanel>
 </MudTabs>
+
 <style>
 
     .card {

@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using TheCatApiV2.Data;
+﻿using TheCatApiV2.Data;
 using TheCatApiV2.DatabaseModels;
 using TheCatApiV2.Models;
 

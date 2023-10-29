@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -24,43 +20,23 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Le champ {0} doit contenir au moins {2} caractères et au maximum {1} caractères.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "New password")]
+            [Display(Name = "Nouveau mot de passe")]
             public string NewPassword { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm new password")]
-            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+            [Display(Name = "Confirmer le nouveau mot de passe")]
+            [Compare("NewPassword", ErrorMessage = "Le nouveau mot de passe et le mot de passe de confirmation ne correspondent pas.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -69,7 +45,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{_userManager.GetUserId(User)}'.");
             }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
@@ -92,7 +68,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Impossible de charger l'utilisateur avec l'ID '{_userManager.GetUserId(User)}'.");
             }
 
             var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
@@ -106,7 +82,7 @@ namespace TheCatApiV2.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your password has been set.";
+            StatusMessage = "Votre mot de passe a été défini avec succès.";
 
             return RedirectToPage();
         }

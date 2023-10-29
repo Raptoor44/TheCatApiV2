@@ -25,7 +25,7 @@ namespace TheCatApiV2.Pages
         private Variant variantLike;
         private Variant variantBadLike;
 
-
+        private List<PictureDatabaseModel> pictures;
 
         [Inject]
         Microsoft.AspNetCore.Identity.UserManager<IdentityUser> userManager { get; set; }
@@ -39,9 +39,12 @@ namespace TheCatApiV2.Pages
             this.pictureController = new PictureController(GetDatabaseContext);
             this.pictureJoinedController = new PictureJoinedController(GetDatabaseContext);
             this.breedController = new BreedController(GetDatabaseContext);
+
             await GetRandomPicture();
             GetIsLike();
             await this.breedController.InitBreedInDatabase();
+
+            InitGlobalScore();
         }
 
         private async void GetIsLike()
@@ -88,6 +91,12 @@ namespace TheCatApiV2.Pages
                 {
                     pictureLike.NumberLiked++;
                     pictureJoined.isLiked = true;
+
+                    if(pictureJoined.isBadLike)
+                    {
+                        pictureLike.NumberBad--;
+                        pictureJoined.isBadLike = false;
+                    }
                 }
                 else
                 {
@@ -121,6 +130,12 @@ namespace TheCatApiV2.Pages
                 {
                     pictureBadLike.NumberBad++;
                     pictureJoined.isBadLike = true;
+
+                    if (pictureJoined.isLiked)
+                    {
+                        pictureBadLike.NumberLiked--;
+                        pictureJoined.isLiked = false;
+                    }
                 }
                 else
                 {
@@ -143,12 +158,24 @@ namespace TheCatApiV2.Pages
         }
         private async void AddInMyFavorites()
         {
-            PictureAssocation pictures = await CreateModelAsync();
+            PictureDatabaseModel pictureFavorite = this.pictureController.GetByUrl(loadPicture.UrlPicture);
 
-            pictures.pictureJoined.IsFavorite = true;
+            if (pictureFavorite != null)
+            {
+                PictureJoinedDatabaseModel pictureJoined = this.pictureJoinedController.GetByPicture(pictureFavorite);
 
-            await pictureJoinedController.AddPictureJoinedAsync(pictures.pictureJoined);
+                pictureJoined.IsFavorite = true;
 
+                pictureJoinedController.UpdatePictureJoined(pictureJoined);
+            }
+            else
+            {
+                PictureAssocation pictures = await CreateModelAsync();
+
+                pictures.pictureJoined.IsFavorite = true;
+
+                await pictureJoinedController.AddPictureJoinedAsync(pictures.pictureJoined);
+            }
             GetIsLike();
             GetRandomPicture();
         }
@@ -213,6 +240,11 @@ GetRandomPicture()
             pictureJoined.Picture = picture;
 
             return new PictureAssocation(picture, pictureJoined);
+        }
+
+        private void InitGlobalScore()
+        {
+            this.pictures = this.pictureController.GetTopLike();
         }
     }
 }

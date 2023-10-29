@@ -4,6 +4,10 @@ using TheCatApiV2.Controller;
 using TheCatApiV2.Models;
 using TheCatApiV2.DatabaseModels;
 using Models;
+using DatabaseModels;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
 
 namespace TheCatApiV2.Pages
 {
@@ -11,6 +15,8 @@ namespace TheCatApiV2.Pages
     {
 
         private BreedController breedController;
+        private PictureController pictureController;
+        private PictureJoinedController pictureJoinedController;
 
         private List<BreedSelectModel> breedsSelect;
 
@@ -23,13 +29,24 @@ namespace TheCatApiV2.Pages
 
         private string apiUrlRandomImage;
 
+        private Picture loadPicture;
+
+        private string currentUserId;
+
         public Position Position { get; set; } = Position.Left;
+
+        [Inject]
+        Microsoft.AspNetCore.Identity.UserManager<IdentityUser> userManager { get; set; }
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
 
 
         [Authorize]
         protected override async Task OnInitializedAsync()
         {
             this.breedController = new BreedController(GetDatabaseContext);
+            this.pictureController = new PictureController(GetDatabaseContext);
+            this.pictureJoinedController = new PictureJoinedController(GetDatabaseContext);
 
             this.pictureBreedsOne = new List<string>();
             this.pictureBreedsTwo = new List<string>();
@@ -94,6 +111,63 @@ namespace TheCatApiV2.Pages
             }
         }
 
+        private async void AddInMyFavorites(string url)
+        {
+            PictureDatabaseModel pictureGetted = this.pictureController.GetByUrl(url);
+
+            if (pictureGetted != null)
+            {
+                PictureJoinedDatabaseModel pictureJoined = pictureJoinedController.GetPictureJoinedByUrlAndUser(currentUserId, url);
+
+                if (pictureJoined == null)
+                {
+                    pictureJoined = new PictureJoinedDatabaseModel();
+
+                    var user = (await authenticationStateTask).User;
+                    var currentUser = await userManager.GetUserAsync(user);
+
+                    this.currentUserId = currentUser.Id;
+
+                    pictureJoined.UserId = this.currentUserId;
+
+                    pictureJoined.Picture = pictureGetted;
+                }
+
+                pictureJoined.IsFavorite = true;
+
+                pictureJoinedController.UpdatePictureJoined(pictureJoined);
+            }
+            else
+            {
+                this.loadPicture = new Picture();
+                this.loadPicture.UrlPicture = url;
+                this.loadPicture.IdBreed = currentBreed.Id;
+
+                PictureAssocation pictures = await CreateModelAsync();
+
+                pictures.pictureJoined.IsFavorite = true;
+
+                await pictureJoinedController.AddPictureJoinedAsync(pictures.pictureJoined);
+            }
+        }
+        private async Task<PictureAssocation> CreateModelAsync()
+        {
+            PictureDatabaseModel picture = new PictureDatabaseModel();
+            PictureJoinedDatabaseModel pictureJoined = new PictureJoinedDatabaseModel();
+
+            picture.UrlPicture = loadPicture.UrlPicture;
+            picture.BreedId = loadPicture.IdBreed;
+
+            var user = (await authenticationStateTask).User;
+            var currentUser = await userManager.GetUserAsync(user);
+
+            this.currentUserId = currentUser.Id;
+
+            pictureJoined.UserId = currentUserId;
+            pictureJoined.Picture = picture;
+
+            return new PictureAssocation(picture, pictureJoined);
+        }
         private async
        Task<string>
 GetRandomPicture(List<string> listUrl)

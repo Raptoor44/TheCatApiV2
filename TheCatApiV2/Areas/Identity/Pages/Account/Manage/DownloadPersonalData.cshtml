@@ -1,5 +1,8 @@
 ﻿@page
+@using TheCatApiV2.Data;
 @model DownloadPersonalDataModel
+@inject DatabaseContext GetDatabaseContext
+
 @{
     ViewData["Title"] = "Télécharger vos données";
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
